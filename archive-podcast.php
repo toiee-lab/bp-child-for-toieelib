@@ -7,6 +7,18 @@
  * @package BusinessPress
  */
 
+$series_image = get_option( 'ss_podcasting_data_image', 'no-image' );
+$series_feed  = get_home_url() . '/feed/podcast/bpcast_token/' . bpcast_get_user_token() . '/';
+
+$feed_podcast = preg_replace( '/^http.?:/', 'podcast:', $series_feed );
+$feed_itunes  = preg_replace( '/^http.?:/', 'pcast:', $series_feed );
+$feed_ovcast  = 'overcast://x-callback-url/add?url=' . $series_feed;
+$feed_castro  = preg_replace( '/^http.?:/', 'podto:', $series_feed );
+
+$archive_title       = get_option( 'ss_podcasting_data_title', 'Podcast' );
+$archive_description = get_option( 'ss_podcasting_data_subtitle', '' );
+
+
 get_header(); ?>
 
 <section id="primary" class="content-area">
@@ -15,7 +27,54 @@ get_header(); ?>
 	<?php if ( have_posts() ) : ?>
 
 		<header class="page-header">
-			<h1>ポッドキャストでーす</h1>
+			<div class="page-header-grid">
+				<div class="series-icon">
+					<img src="<?php echo $series_image; ?>">
+				</div>
+				<div class="seriees-title">
+					<h1 class="page-title-series"><?php echo $archive_title; ?></h1>
+					<div class="taxonomy-description-series"><?php echo $archive_description; ?></div>
+				</div>
+			</div>
+			<div class="subscribe">
+			<?php if ( is_user_logged_in() ) : ?>
+				<button onclick="location.href='<?php echo $feed_podcast; ?>'">Podcast</button>
+				<button onclick="location.href='<?php echo $feed_itunes; ?>'">iTunes</button>
+				<button onclick="location.href='<?php echo $feed_ovcast; ?>'">Overcast</button>
+				<button onclick="location.href='<?php echo $feed_castro; ?>'">Castro</button>
+				<br>
+				<input type="text" value="<?php echo $series_feed; ?>" id="copy_feed" onclick="this.select();" readonly> <button onclick="copy_feed()">Copy feed</button>
+				<script>
+					function copy_feed() {
+						/* Get the text field */
+						var copyText = document.getElementById("copy_feed");
+
+						/* Select the text field */
+						copyText.select(); 
+						copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+						/* Copy the text inside the text field */
+						document.execCommand("copy");
+
+						/* Alert the copied text */
+						alert("コピーしました");
+					}
+				</script>
+			<?php else : ?>
+				<button onclick="location.href='#bp-login-form'">Podcast</button>
+				<button onclick="location.href='#bp-login-form'">iTunes</button>
+				<button onclick="location.href='#bp-login-form'">Overcast</button>
+				<button onclick="location.href='#bp-login-form'">Castro</button>
+				<br>
+				<input type="text" value="<?php echo $series_feed; ?>" id="copy_feed" onclick="this.select();" readonly> <button onclick="copy_feed()">Copy feed</button>
+				<script>
+					function copy_feed() {
+						/* Get the text field */
+						location.href='#bp-login-form';
+					}
+				</script>
+			<?php endif; ?>
+			</div>
 		</header><!-- .page-header -->
 
 		<div class="loop-wrapper">
