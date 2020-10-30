@@ -136,3 +136,22 @@ function sv_wc_memberships_add_post_lock_icon( $title, $post_id ) {
 	return $title;
 }
 add_filter( 'the_title', 'sv_wc_memberships_add_post_lock_icon', 10, 2 );
+
+
+function bplib_login_logout_css(){
+
+	if ( is_user_logged_in() ) {
+		?>
+	<style id="bplib_login_logout">
+		.logged_in_hide { display: none; }
+	</style>
+		<?php
+	} else {
+		?>
+	<style id="bplib_login_logout">
+		.logged_out_hide { display: none; }
+	</style>
+		<?php
+	}
+}
+add_action( 'wp_head', 'bplib_login_logout_css' );
