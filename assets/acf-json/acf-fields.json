@@ -1,12 +1,65 @@
 [
     {
-        "key": "group_5ed70f39b6df3",
-        "title": "公開設定",
+        "key": "group_5f9bc6bbc72e7",
+        "title": "ウェビナー",
         "fields": [
             {
-                "key": "field_5ed70f7aca04c",
-                "label": "公開範囲",
-                "name": "restrict_setting",
+                "key": "field_5f9bc6cf4ec70",
+                "label": "募集中",
+                "name": "open",
+                "type": "true_false",
+                "instructions": "イベントが募集中である状態",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "募集中にする。期間が過ぎていれば募集中ではなくなります",
+                "default_value": 1,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5f9bc71d4ec71",
+                "label": "開始時間",
+                "name": "time_start",
+                "type": "date_time_picker",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "display_format": "Y年m月d日 H:i",
+                "return_format": "Y-m-d H:i:s",
+                "first_day": 1
+            },
+            {
+                "key": "field_5f9bc7824ec73",
+                "label": "終了時間",
+                "name": "time_end",
+                "type": "date_time_picker",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "display_format": "Y年m月d日 H:i",
+                "return_format": "Y-m-d H:i:s",
+                "first_day": 1
+            },
+            {
+                "key": "field_5f9bc7be4ec75",
+                "label": "締め切り",
+                "name": "time_close",
                 "type": "select",
                 "instructions": "",
                 "required": 1,
@@ -17,50 +70,67 @@
                     "id": ""
                 },
                 "choices": {
-                    "all": "すべてのユーザーに公開",
-                    "restrict": "選択したユーザーにだけ公開"
+                    "10min": "10分前",
+                    "30min": "30分前",
+                    "1h": "1時間前",
+                    "1d": "1日前",
+                    "3d": "3日前"
                 },
-                "default_value": "all",
+                "default_value": "10min",
                 "allow_null": 0,
                 "multiple": 0,
-                "ui": 1,
-                "ajax": 0,
+                "ui": 0,
                 "return_format": "value",
+                "ajax": 0,
                 "placeholder": ""
             },
             {
-                "key": "field_5ed711b2ca04d",
-                "label": "ユーザー",
-                "name": "restrict_user",
-                "type": "user",
-                "instructions": "公開したいユーザーを個別で選んでください",
-                "required": 0,
-                "conditional_logic": [
-                    [
-                        {
-                            "field": "field_5ed70f7aca04c",
-                            "operator": "==",
-                            "value": "restrict"
-                        }
-                    ]
-                ],
+                "key": "field_5f9bc7ed4ec76",
+                "label": "募集人数",
+                "name": "limit",
+                "type": "number",
+                "instructions": "参加者の人数",
+                "required": 1,
+                "conditional_logic": 0,
                 "wrapper": {
                     "width": "",
                     "class": "",
                     "id": ""
                 },
-                "role": "",
-                "allow_null": 1,
-                "multiple": 1,
-                "return_format": "id"
+                "default_value": 10,
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "min": "",
+                "max": "",
+                "step": ""
+            },
+            {
+                "key": "field_5f9bc8194ec77",
+                "label": "参加者メッセージ",
+                "name": "message",
+                "type": "wysiwyg",
+                "instructions": "申し込みされた方だけに見せるコンテンツ。WebinarのURLなどを貼り付けてください。、",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "tabs": "all",
+                "toolbar": "full",
+                "media_upload": 1,
+                "delay": 0
             }
         ],
         "location": [
             [
                 {
-                    "param": "taxonomy",
+                    "param": "post_type",
                     "operator": "==",
-                    "value": "series"
+                    "value": "webinar"
                 }
             ]
         ],
@@ -74,27 +144,33 @@
         "description": ""
     },
     {
-        "key": "group_5ed83ad8be464",
-        "title": "公開設定(社外)",
+        "key": "group_5f9c24eb3fee6",
+        "title": "チケット",
         "fields": [
             {
-                "key": "field_5ed83b1360975",
-                "label": "公開する",
-                "name": "not_restrict",
-                "type": "true_false",
-                "instructions": "オンにすると、ログインなしで閲覧できます",
-                "required": 0,
+                "key": "field_5f9c24f2276d4",
+                "label": "ウェビナー",
+                "name": "webinar",
+                "type": "relationship",
+                "instructions": "",
+                "required": 1,
                 "conditional_logic": 0,
                 "wrapper": {
                     "width": "",
                     "class": "",
                     "id": ""
                 },
-                "message": "公開する",
-                "default_value": 0,
-                "ui": 1,
-                "ui_on_text": "",
-                "ui_off_text": ""
+                "post_type": [
+                    "webinar"
+                ],
+                "taxonomy": "",
+                "filters": [
+                    "search"
+                ],
+                "elements": "",
+                "min": "",
+                "max": "",
+                "return_format": "object"
             }
         ],
         "location": [
@@ -102,14 +178,7 @@
                 {
                     "param": "post_type",
                     "operator": "==",
-                    "value": "post"
-                }
-            ],
-            [
-                {
-                    "param": "post_type",
-                    "operator": "==",
-                    "value": "page"
+                    "value": "webinar-ticket"
                 }
             ]
         ],

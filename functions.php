@@ -51,6 +51,8 @@ if( function_exists( 'ssp_beta_check' ) ) {
 
 require_once 'includes/shortcode.php';
 
+require_once 'includes/webinar.php';
+
 function bplib_category() {
 	$post = get_post();
 
