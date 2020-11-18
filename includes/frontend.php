@@ -155,3 +155,12 @@ function bplib_login_logout_css(){
 	}
 }
 add_action( 'wp_head', 'bplib_login_logout_css' );
+
+
+function jetpackme_allow_my_post_types( $allowed_post_types ) {
+	$allowed_post_types[] = 'podcast';
+	$allowed_post_types[] = 'page';
+	
+    return $allowed_post_types;
+}
+add_filter( 'rest_api_allowed_post_types', 'jetpackme_allow_my_post_types' );
