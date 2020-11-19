@@ -53,6 +53,8 @@ require_once 'includes/shortcode.php';
 
 require_once 'includes/webinar.php';
 
+require_once 'includes/helpscout-beacon.php';
+
 function bplib_category() {
 	$post = get_post();
 
