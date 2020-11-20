@@ -53,7 +53,11 @@ require_once 'includes/shortcode.php';
 
 require_once 'includes/webinar.php';
 
+require_once 'includes/options-page.php';
+
 require_once 'includes/helpscout-beacon.php';
+
+require_once 'includes/mailerlite.php';
 
 function bplib_category() {
 	$post = get_post();

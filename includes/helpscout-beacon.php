@@ -4,14 +4,6 @@
  * オプションページを作成
  */
 if( function_exists('acf_add_options_page') ) {
-	
-	acf_add_options_page(array(
-		'page_title' 	=> 'カメラジ設定',
-		'menu_title'	=> 'カメラジ設定',
-		'menu_slug' 	=> 'theme-general-settings',
-		'capability'	=> 'edit_posts',
-		'redirect'		=> false
-	));
 
 	acf_add_local_field_group(array(
 		'key' => 'group_5fb61ca2aaa2d',
