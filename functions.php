@@ -59,6 +59,8 @@ require_once 'includes/helpscout-beacon.php';
 
 require_once 'includes/mailerlite.php';
 
+require_once 'includes/trial.php';
+
 function bplib_category() {
 	$post = get_post();
 

@@ -88,6 +88,7 @@ if( function_exists('acf_add_options_page') ) {
 			name: '<?php echo $name; ?>',
 			email: '<?php echo esc_html( $current_user->user_email ); ?>',
 		});
+		<?php do_action( 'beacon_logged_in_script' ); ?>
 	</script>
 					<?php
 				}
