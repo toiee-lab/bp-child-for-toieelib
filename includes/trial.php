@@ -62,4 +62,91 @@ if( function_exists('acf_add_options_page') &&  function_exists( 'wc_memberships
 		}
 	);
 
+	acf_add_local_field_group(array(
+		'key' => 'group_5fb7ba7b14cf6',
+		'title' => 'トライアル設定',
+		'fields' => array(
+			array(
+				'key' => 'field_5fb7ee3033418',
+				'label' => 'トライアルプラン',
+				'name' => 'trial_member_plan',
+				'type' => 'post_object',
+				'instructions' => 'トライアルの会員権限を指定してください',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'post_type' => array(
+					0 => 'wc_membership_plan',
+				),
+				'taxonomy' => '',
+				'allow_null' => 0,
+				'multiple' => 0,
+				'return_format' => 'id',
+				'ui' => 1,
+			),
+			array(
+				'key' => 'field_5fb92bf401329',
+				'label' => '上位プラン',
+				'name' => 'premium_member_plans',
+				'type' => 'post_object',
+				'instructions' => '有料プランを指定してください。既に有料プランに入っている人にメッセージを出させないために指定します。',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'post_type' => array(
+					0 => 'wc_membership_plan',
+				),
+				'taxonomy' => '',
+				'allow_null' => 0,
+				'multiple' => 1,
+				'return_format' => 'id',
+				'ui' => 1,
+			),
+			array(
+				'key' => 'field_5fb932aa78aed',
+				'label' => 'トライアル向け Message ID',
+				'name' => 'trial_message_id',
+				'type' => 'text',
+				'instructions' => 'トライアル向けに作成した メッセージの id を記載します。記載しなければ、使いません。',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'default_value' => '',
+				'placeholder' => '',
+				'prepend' => '',
+				'append' => '',
+				'maxlength' => '',
+			),
+		),
+		'location' => array(
+			array(
+				array(
+					'param' => 'options_page',
+					'operator' => '==',
+					'value' => 'theme-general-settings',
+				),
+			),
+		),
+		'menu_order' => 0,
+		'position' => 'normal',
+		'style' => 'default',
+		'label_placement' => 'top',
+		'instruction_placement' => 'label',
+		'hide_on_screen' => '',
+		'active' => true,
+		'description' => '',
+	));
+	
 endif;
