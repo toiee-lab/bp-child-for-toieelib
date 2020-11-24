@@ -24,7 +24,7 @@ if( function_exists('acf_add_options_page') &&  function_exists( 'wc_memberships
 		}
 
 		// トライアルを持っていたら、メッセージを出す
-		if ( $mem_ids[ $trial ] ) {
+		if ( isset( $mem_ids[ $trial ] ) ) {
 			return true;
 			echo "Beacon('show-message', '{$trial_msgid}' );\n";
 		}
