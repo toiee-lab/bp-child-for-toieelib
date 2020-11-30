@@ -4,8 +4,8 @@
  */
 if( function_exists('acf_add_options_page') &&  function_exists( 'wc_memberships_get_user_active_memberships' ) ) :
 
-	function tlib_user_is_trial() {
-		$user_id     =  get_current_user_id();
+	function tlib_user_is_trial( $return_end_date = false ) {
+		$user_id     = get_current_user_id();
 		$memberships = wc_memberships_get_user_active_memberships( $user_id );
 		$premiums    = get_field( 'premium_member_plans', 'option' );
 		$trial       = get_field( 'trial_member_plan', 'option' );
@@ -25,8 +25,13 @@ if( function_exists('acf_add_options_page') &&  function_exists( 'wc_memberships
 
 		// トライアルを持っていたら、メッセージを出す
 		if ( isset( $mem_ids[ $trial ] ) ) {
-			return true;
-			echo "Beacon('show-message', '{$trial_msgid}' );\n";
+			if ( $return_end_date ) {
+				$id       = ($mem_ids[ $trial ])->id;
+				$end_date = get_post_meta( $id, '_end_date', true );
+				return $end_date;
+			} else {
+				return true;
+			}
 		}
 
 		return false;
@@ -150,3 +155,52 @@ if( function_exists('acf_add_options_page') &&  function_exists( 'wc_memberships
 	));
 	
 endif;
+
+
+/**
+ * トライアルバーを表示するための設定
+ */
+function tlib_trial_trial_bar( $wp_customize ) {
+	// Top Bar
+	$wp_customize->add_section( 'kameradio_trial_bar', array(
+		'title'    => esc_html__( 'トライアル・バー', 'kameradio' ),
+		'priority' => 50,
+	) );
+	$wp_customize->add_setting( 'kameradio_enable_trial_bar', array(
+		'default'           => '',
+		'sanitize_callback' => 'businesspress_sanitize_checkbox',
+	) );
+	$wp_customize->add_control( 'kameradio_enable_trial_bar', array(
+		'label'    => esc_html__( 'Enable Trial Bar', 'kameradio' ),
+		'section'  => 'kameradio_trial_bar',
+		'type'     => 'checkbox',
+		'priority' => 1,
+	) );
+	$wp_customize->add_setting( 'kameradio_trial_bar_text', array(
+		'default'           => '',
+		'sanitize_callback' => 'wp_kses',
+	) );
+	$wp_customize->add_control( 'kameradio_trial_bar_text', array(
+		'label'    => esc_html__( 'Message', 'kameradio' ),
+		'section'  => 'kameradio_trial_bar',
+		'type'     => 'text',
+		'priority' => 2,
+	) );
+}
+add_action( 'customize_register', 'tlib_trial_trial_bar' );
+
+/**
+ * トライアルメッセージを表示する
+ *
+ * @return void
+ */
+function kameradio_top_bar_trial_message() {
+	$_end_date = tlib_user_is_trial( true );
+	$end_date  = date( 'Y/m/d', strtotime( $_end_date ) );
+	$remain    = floor( ( strtotime( $_end_date ) - time() ) / 60 / 60 / 24 );
+	$message   = get_theme_mod( 'kameradio_trial_bar_text' );
+	$message   = get_theme_mod( 'kameradio_trial_bar_text' );
+
+	$message = str_replace( array( '%remain%', '%end_date%' ), array( $remain, $end_date ), $message );
+	echo $message;
+}
