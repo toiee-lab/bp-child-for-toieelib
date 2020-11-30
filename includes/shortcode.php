@@ -146,3 +146,119 @@ function businesspress_entry_meta() {
 	</div><!-- .entry-meta -->
 	<?php
 }
+
+
+/**
+ * Webinar の スライダーを表示するためのショートコード
+ * w5 = webinarを最新から5つ取得する
+ * s1 = series id が1を取得
+ * p1 = post id が 1 を取得
+ * 
+ * 例) [bp-lib-webinar-slider content="w5,s1,s2,p1,p2,p3"]
+ */
+add_shortcode( 'bplib-webinar-slider', 'bplib_webinar_slider' );
+function bplib_webinar_slider( $atts ) {
+	if ( ! isset( $atts['content'] ) ) {
+		return '';
+	}
+
+	$arr = explode( ',', $atts['content'] );
+	if ( 0 === count( $arr ) ) {
+		return '';
+	}
+
+	$arr = array_map( 'trim' , $arr );
+	$els = array();
+
+	foreach( $arr as $v ) {
+		if( preg_match( '/^([a-z])(\d+)$/', $v, $matches ) ) {
+			$type = $matches[1];
+			$id   = $matches[2];
+
+			switch ( $type ) {
+				case 'w': //webinar
+					$ps = get_posts(
+						array(
+							'post_type'      => 'webinar',
+							'posts_per_page' => $id,
+							'orderby'        => 'time_start',
+							'meta_key'       => 'time_start',
+						)
+					);
+
+					foreach( $ps as $p ) {
+						$els[] = array(
+							'type'  => 'webinar',
+							'id'    => $p->ID,
+							'title' => $p->post_title,
+							'date'  => date( 'Y年m月d日 H:i', strtotime( get_field( 'time_start', $p->ID ) ) ),
+							'bg'    => get_the_post_thumbnail_url( $p ),
+							'url'   => get_permalink( $p ),
+						);
+					}
+					break;
+
+				case 's': //series
+					$t = get_term( $id, 'series' );
+					if ( null != $t ) {
+						$series_image = get_option( 'ss_podcasting_data_image_' . $id, 'no-image' );
+						$els[] = array(
+							'type'  => 'series',
+							'id'    => $id,
+							'title' => $t->name,
+							'date'  => '',
+							'bg'    => $series_image,
+							'url'   => get_term_link( $t ),
+						);
+					}
+				break;
+
+				case 'p': //post
+					$p = get_post( $id );
+					if ( null != $p ) {
+						$els[] = array(
+							'type'  => $p->post_type,
+							'id'    => $id,
+							'title' => $p->post_title,
+							'date'  => date( 'Y年m月d日 H:i', strtotime( $p->post_date ) ),
+							'bg'    => get_the_post_thumbnail_url( $p ),
+							'url'   => get_permalink( $p )
+						);
+					}
+				break;
+			}
+		}
+	}
+
+	ob_start();
+?>
+<div class="featured-post alignfull">
+	<?php foreach( $els as $el ) : ?>
+	<div class="slick-item">
+		<div class="featured-entry" style="background-image:url('<?php echo esc_url( $el['bg'] ); ?>');">
+			<div class="featured-entry-overlay">
+				<div class="featured-entry-content">
+					<div class="featured-entry-category"><?php echo esc_html( $el['type'] ); ?></div>
+					<h2 class="featured-entry-title"><a href="<?php echo esc_url( $el['url'] ); ?>" rel="bookmark"><?php echo esc_html( $el['title'] ); ?></a></h2>
+					<div class="featured-entry-date posted-on"><a href="<?php echo esc_url( $el['url'] ); ?>" rel="bookmark"><?php echo esc_html( $el['date'] ); ?></a></div>
+				</div><!-- .featured-entry-content -->
+			</div><!-- .featured-entry-overlay -->
+		</div><!-- .featured-entry -->
+	</div><!-- .slick-item -->	
+	<?php endforeach; ?>
+</div>
+<?php	
+	$html = ob_get_contents();
+	ob_end_clean();
+
+	// bg_img, cat_name, title, date
+	return $html;
+}
+
+add_action(
+	'wp_enqueue_scripts',
+	function () {
+		wp_enqueue_script( 'slick', get_theme_file_uri( '/js/slick.js' ), array( 'jquery' ), '1.9.0', true );
+		wp_enqueue_style( 'slick-style', get_theme_file_uri( '/css/slick.css' ), array(), '1.9.0' );
+	}
+);
