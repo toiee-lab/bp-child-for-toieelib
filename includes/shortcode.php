@@ -187,13 +187,15 @@ function bplib_webinar_slider( $atts ) {
 					);
 
 					foreach( $ps as $p ) {
+						$url = get_permalink( $p );
 						$els[] = array(
 							'type'  => 'webinar',
 							'id'    => $p->ID,
 							'title' => $p->post_title,
 							'date'  => date( 'Y年m月d日 H:i', strtotime( get_field( 'time_start', $p->ID ) ) ),
 							'bg'    => get_the_post_thumbnail_url( $p ),
-							'url'   => get_permalink( $p ),
+							'url'   => $url,
+							'lead'  => '<div class="home-header-button"><a href="' . $url . '" class="home-header-button-sub">参加する</a></div>',
 						);
 					}
 					break;
@@ -209,6 +211,7 @@ function bplib_webinar_slider( $atts ) {
 							'date'  => '',
 							'bg'    => $series_image,
 							'url'   => get_term_link( $t ),
+							'lead'  => '',
 						);
 					}
 				break;
@@ -222,7 +225,8 @@ function bplib_webinar_slider( $atts ) {
 							'title' => $p->post_title,
 							'date'  => date( 'Y年m月d日 H:i', strtotime( $p->post_date ) ),
 							'bg'    => get_the_post_thumbnail_url( $p ),
-							'url'   => get_permalink( $p )
+							'url'   => get_permalink( $p ),
+							'lead'  => '',
 						);
 					}
 				break;
@@ -241,6 +245,7 @@ function bplib_webinar_slider( $atts ) {
 					<div class="featured-entry-category"><?php echo esc_html( $el['type'] ); ?></div>
 					<h2 class="featured-entry-title"><a href="<?php echo esc_url( $el['url'] ); ?>" rel="bookmark"><?php echo esc_html( $el['title'] ); ?></a></h2>
 					<div class="featured-entry-date posted-on"><a href="<?php echo esc_url( $el['url'] ); ?>" rel="bookmark"><?php echo esc_html( $el['date'] ); ?></a></div>
+					<div class="featured-lead"><?php echo $el['lead']; ?></div>
 				</div><!-- .featured-entry-content -->
 			</div><!-- .featured-entry-overlay -->
 		</div><!-- .featured-entry -->
