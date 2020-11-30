@@ -2,6 +2,25 @@
 /**
  * WooCommerce に関する設定を記述しています
  */
+
+/**
+ * WooCommerce の請求情報を減らす
+ */
+add_filter(
+    'woocommerce_billing_fields',
+    function ( $fields = array() ) {
+        unset($fields['billing_company']);
+        unset($fields['billing_address_1']);
+        unset($fields['billing_address_2']);
+        unset($fields['billing_state']);
+        unset($fields['billing_city']);
+        unset($fields['billing_phone']);
+        unset($fields['billing_postcode']);
+        unset($fields['billing_country']);
+        return $fields;
+    }
+);
+
 // 登録フォームに「名前」と「苗字」を挿入
 add_action(
 	'woocommerce_register_form_start',
