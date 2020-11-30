@@ -49,6 +49,8 @@ if( function_exists( 'ssp_beta_check' ) ) {
 	require_once 'includes/frontend.php';
 }
 
+require_once 'includes/woocommerce-settings.php';
+
 require_once 'includes/shortcode.php';
 
 require_once 'includes/webinar.php';
