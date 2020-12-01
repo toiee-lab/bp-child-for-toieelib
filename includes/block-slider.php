@@ -5,7 +5,7 @@
  * @package block
  */
 
-add_action('acf/init', 'kameradio_slider_acf_init_block_types');
+add_action( 'acf/init', 'kameradio_slider_acf_init_block_types' );
 /**
  * カメラジ・スライダーブロックを登録します
  *
