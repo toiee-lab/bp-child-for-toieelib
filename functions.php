@@ -13,12 +13,8 @@ add_action( 'wp_enqueue_scripts', 'businesspress_parent_theme_enqueue_styles' );
  * Enqueue scripts and styles.
  */
 function businesspress_parent_theme_enqueue_styles() {
-	wp_enqueue_style( 'businesspress-style', get_template_directory_uri() . '/style.css' );
-	wp_enqueue_style( 'businesspress-lib-style',
-		get_stylesheet_directory_uri() . '/style.css',
-		array( 'businesspress-style' )
-	);
-
+	wp_enqueue_style( 'businesspress-style', get_template_directory_uri() . '/style.css', array(), '2.0.3' );
+	wp_enqueue_style( 'businesspress-lib-style', get_stylesheet_directory_uri() . '/style.css', array( 'businesspress-style' ), '2.0.3' );
 }
 
 /**
