@@ -110,7 +110,7 @@ get_header(); ?>
 			}
 		?>
 			<tr class="<?php echo $available_class; ?>">
-				<td><?php echo date( 'n月 d日', strtotime( $fields['time_start'] ) ); ?><br>
+				<td><?php echo date_i18n( 'n月 d日(D)', strtotime( $fields['time_start'] ) ); ?><br>
 				<?php echo date( 'H:i', strtotime( $fields['time_start'] ) ); ?> - <?php echo date( 'H:i', strtotime( $fields['time_end'] ) ); ?><br>
 				<small>申し込みは、<?php echo $close_msg; ?></small></td>
 				<td><a href="<?php the_permalink(); ?>"><?php the_title( '<strong>', '</strong>' ); ?></a><br>

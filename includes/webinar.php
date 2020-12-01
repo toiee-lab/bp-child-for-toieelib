@@ -1,6 +1,44 @@
 <?php
+/**
+ * Webinarのためのスクリプト
+ *
+ * @package kameradio
+ */
 
+/**
+ * Webinarの表示される日付を無理矢理、開始日時に設定
+ */
+add_filter(
+	'get_the_date',
+	function( $the_date, $format, $post ) {
+		if ( is_admin() ) {
+			return $the_date;
+		}
+
+		if ( 'webinar' === $post->post_type && '' === $format ) {
+			$d       = get_field( 'time_start', $post );
+			$t       = strtotime( $d );
+			$_format = ! empty( $format ) ? $format : get_option( 'date_format' );
+			$the_d   = date_i18n( $_format . '(D)', $t );
+			return $the_d;
+		} else {
+			return $the_date;
+		}
+	},
+	10,
+	3
+);
+
+/**
+ * ウェビナーのチケットを削除するための処理をフックで追加
+ */
 add_filter( 'acf/save_post', 'possibly_delete_post' );
+/**
+ * 投稿を削除できるメソッドを作成
+ *
+ * @param object $post_id オブジェクト.
+ * @return void
+ */
 function possibly_delete_post( $post_id ) {
 	$post_type = get_post_type( $post_id );
 	// change to post type you want them to be able to delete
