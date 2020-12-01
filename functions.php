@@ -21,26 +21,30 @@ function businesspress_parent_theme_enqueue_styles() {
 
 }
 
-//enqueues our external font awesome stylesheet
-function enqueue_our_required_stylesheets(){
-	wp_enqueue_style('font-awesome', '//maxcdn.bootstrapcdn.com/font-awesome/5.4.0/css/font-awesome.min.css'); 
+/**
+ * Font awesome を読み込むための設定
+ *
+ * @return void
+ */
+function enqueue_our_required_stylesheets() {
+	wp_enqueue_style( 'font-awesome', '//maxcdn.bootstrapcdn.com/font-awesome/5.4.0/css/font-awesome.min.css' );
 }
-add_action('wp_enqueue_scripts','enqueue_our_required_stylesheets');
+add_action( 'wp_enqueue_scripts', 'enqueue_our_required_stylesheets' );
 
 
-// required plugin checker
+/* required plugin checker */
 require_once 'includes/tgmpa.php';
 
-// updater
+/* updater */
 require_once 'includes/plugin-update-checker/plugin-update-checker.php';
-$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+$my_update_checker = Puc_v4_Factory::buildUpdateChecker(
 	'https://github.com/toiee-lab/bp-child-for-toieelib',
 	__FILE__,
 	'businesspress-lib'
 );
 
-// add-on for membership site
-if( function_exists( 'ssp_beta_check' ) ) {
+/* add-on for membership site */
+if ( function_exists( 'ssp_beta_check' ) ) {
 
 	require_once 'includes/membersite.php';
 
@@ -63,11 +67,16 @@ require_once 'includes/mailerlite.php';
 
 require_once 'includes/trial.php';
 
+/**
+ * シリーズ名を表示するためのテンプレートタグ
+ *
+ * @return void
+ */
 function bplib_category() {
 	$post = get_post();
 
 	echo '<div class="cat-links">';
 	echo get_the_term_list( $post->ID, 'series', '<span class="category-sep">', '/', '</span>' );
-//	the_category( '<span class="category-sep">/</span>' );
+	/* the_category( '<span class="category-sep">/</span>' ); */
 	echo '</div><!-- .cat-links -->';
 }
