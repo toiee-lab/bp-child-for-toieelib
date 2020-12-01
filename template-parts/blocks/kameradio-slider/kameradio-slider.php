@@ -45,7 +45,7 @@ if ( have_rows( 'slider_elements' ) ) :
 					'type'  => 'webinar',
 					'id'    => $p->ID,
 					'title' => $p->post_title,
-					'date'  => date( 'Y年m月d日 H:i から', strtotime( get_field( 'time_start', $p->ID ) ) ),
+					'date'  => get_the_date( '', $p->ID ) . 'から',
 					'bg'    => get_the_post_thumbnail_url( $p ),
 					'url'   => $url,
 					'lead'  => $lead,
@@ -102,7 +102,7 @@ if ( have_rows( 'slider_elements' ) ) :
 					'type'  => $p->post_type,
 					'id'    => $p->ID,
 					'title' => $p_title,
-					'date'  => date( 'Y年m月d日 H:i', strtotime( $p->post_date ) ),
+					'date'  => get_the_date( '', $p->ID ),
 					'bg'    => get_the_post_thumbnail_url( $p ),
 					'url'   => $url,
 					'lead'  => $lead,
@@ -120,7 +120,7 @@ if ( is_admin() ) {
 	<p>表示予定のデータは以下の通りです。</p>
 	<ul>
 		<?php foreach ( $els as $el ) : ?>
-		<li><a href="<?php echo esc_url( $el['url'] ); ?>" target="_blank"><?php echo esc_html( $el['type'] ); ?> : <?php echo esc_html( $el['title'] ); ?> : <?php echo esc_html( $el['date'] ); ?></a></li>
+		<li><a href="<?php echo esc_url( $el['url'] ); ?>" target="_blank"><?php echo esc_html( $el['type'] ); ?> : <?php echo esc_html( $el['title'] ); ?></a></li>
 		<?php endforeach; ?>
 	</ul>
 </div>
