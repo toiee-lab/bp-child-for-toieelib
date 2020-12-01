@@ -67,6 +67,8 @@ require_once 'includes/mailerlite.php';
 
 require_once 'includes/trial.php';
 
+require_once 'includes/block-slider.php';
+
 /**
  * シリーズ名を表示するためのテンプレートタグ
  *

@@ -5,7 +5,7 @@ Description:    Businesspress child theme.
 Author:         toiee Lab
 Author URI:     https://toiee.jp/
 Template:       businesspress
-Version:        1.8
+Version:        2.0
 */
 
 .page-title-series {
@@ -121,4 +121,17 @@ Version:        1.8
 .webinar-disable,
 .webinar-disable a {
 	color : #aaa;
+}
+
+.featured-lead p {
+	color : rgba( 255, 255, 255, 0.8 );
+	font-size: 80%;
+}
+
+.featured-entry-date-slider {
+	color : white;
+}
+
+.featured-lead .home-header-button a {
+	margin-top: 10px;
 }
