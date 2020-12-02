@@ -18,17 +18,25 @@
 
 	<div class="entry-content">
 		<?php the_content(); ?>
-		<?php wp_link_pages( array(	'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'businesspress' ), 'after'  => '</div>', 'pagelink' => '<span class="page-numbers">%</span>',  ) ); ?>
+		<?php
+		wp_link_pages(
+			array(
+				'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'businesspress' ),
+				'after'  => '</div>', 'pagelink' => '<span class="page-numbers">%</span>',
+			)
+		);
+		?>
 		<?php
 		$fields     = get_fields();
 		$open       = $fields['open'];
-		$in_time    = strtotime( $fields['time_start'] ) > time();
+		$in_time    = strtotime( $fields['time_end'] ) > time();
 		$tickets     = get_posts(
 			array(
-				'post_type' => 'webinar-ticket',
-				'meta_query' => array(
+				'post_type'      => 'webinar-ticket',
+				'posts_per_page' => -1,
+				'meta_query'     => array(
 					array(
-						'key' => 'webinar',
+						'key'   => 'webinar',
 						'value' => get_the_ID(),
 					),
 				),
@@ -40,6 +48,10 @@
 		$close_time = strtotime( $fields['time_start'] );
 		$close_msg  = '直前までOK';
 		switch ( $fields['time_close'] ) {
+			case '0':
+				$close_time = strtotime( $fields['time_end'] );
+				$close_msg  = '途中参加OK';
+				break;
 			case '10min':
 				$close_time -= 60 * 10;
 				$close_msg   = '10分前まで';
