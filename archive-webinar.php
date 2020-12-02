@@ -33,6 +33,7 @@ get_header(); ?>
 			$tickets     = get_posts(
 				array(
 					'post_type' => 'webinar-ticket',
+					'posts_per_page' => -1,
 					'meta_query' => array(
 						array(
 							'key' => 'webinar',
@@ -45,29 +46,33 @@ get_header(); ?>
 
 			// reserve close time
 			$close_time = strtotime( $fields['time_start'] );
-			$close_msg  = '直前までOK';
+			$close_msg  = '申し込みは、直前までOK';
 			switch ( $fields['time_close'] ) {
+				case '0':
+					$close_time = strtotime( $fields['time_end'] );
+					$close_msg  = '途中参加OK';
+					break;
 				case '10min':
 					$close_time -= 60 * 10;
-					$close_msg   = '10分前まで';
+					$close_msg   = '申し込みは、10分前まで';
 					break;
 				case '30min':
 					$close_time -= 60 * 30;
-					$close_msg   = '30分前まで';
+					$close_msg   = '申し込みは、30分前まで';
 					break;
 				case '1d':
 					$close_time  = strtotime( date( 'Y-m-d 23:59:59', $close_time ) );
 					$close_time -= 24 * 60 * 60;
-					$close_msg   = '前日まで';
+					$close_msg   = '申し込みは、前日まで';
 					break;
 				case '3d':
 					$close_time  = strtotime( date( 'Y-m-d 23:59:59', $close_time ) );
 					$close_time -= 3 * 24 * 60 * 60;
-					$close_msg   = '3日前まで';
+					$close_msg   = '申し込みは、3日前まで';
 					break;
 			}
 			$can_reserve = $close_time > time();
-	
+
 			// vacant
 			$limit = $fields['limit'];
 			if ( $ticket_num < $limit ) {
@@ -112,7 +117,7 @@ get_header(); ?>
 			<tr class="<?php echo $available_class; ?>">
 				<td><?php echo date_i18n( 'n月 d日(D)', strtotime( $fields['time_start'] ) ); ?><br>
 				<?php echo date( 'H:i', strtotime( $fields['time_start'] ) ); ?> - <?php echo date( 'H:i', strtotime( $fields['time_end'] ) ); ?><br>
-				<small>申し込みは、<?php echo $close_msg; ?></small></td>
+				<small><?php echo $close_msg; ?></small></td>
 				<td><a href="<?php the_permalink(); ?>"><?php the_title( '<strong>', '</strong>' ); ?></a><br>
 				</td>
 				<td>
