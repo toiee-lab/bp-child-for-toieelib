@@ -49,26 +49,33 @@ get_header(); ?>
 			$in_time   = $now_time < $end_time;
 			$available = $open && $in_time && $vacant && $can_reserve;
 
+			if ( is_user_logged_in() ) {
+				$current_user_id                 = ( wp_get_current_user() )->ID;
+				list( $is_attendee, $ticket_id ) = has_ticket( $current_user_id, $tickets );
+			} else {
+				$is_attendee = false;
+			}
+
 			$ticket_status = '';
 			if ( $can_reserve ) {
 				if ( $open ) {
 					if ( $is_attendee ) {
-						$ticket_status = '申し込み済';
+						$ticket_status = '✅ 申し込み済';
 					} else {
 						if ( $vacant ) {
 							$ticket_status = '募集中';
 						} else {
-							$ticket_status = '満席';
+							$ticket_status = '🈵 満席';
 						}
 					}
 				} else {
-					$ticket_status = '閉鎖中';
+					$ticket_status = '⛔️ 閉鎖中';
 				}
 			} else {
 				$ticket_status = '終了しました';
 			}
 
-			$available_class = $available ? '' : 'webinar-disable';
+			$available_class = $in_time ? '' : 'webinar-disable';
 			?>
 			<tr class="<?php echo esc_attr( $available_class ); ?>">
 				<td>

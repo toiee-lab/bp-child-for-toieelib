@@ -83,11 +83,10 @@ function get_tickets( $webinar_id ) {
  * @return array 参加者, チケットid.
  */
 function has_ticket( $current_user_id, $tickets ) {
-	$current_user_id = ( wp_get_current_user() )->ID;
-	$is_attendee     = false;
-	$ticket_id       = false;
+	$is_attendee = false;
+	$ticket_id   = false;
 	foreach ( $tickets as $ticket ) {
-		if ( $ticket->post_author === $current_user_id ) {
+		if ( (int) ( $ticket->post_author ) === $current_user_id ) {
 			$is_attendee = true;
 			$ticket_id   = $ticket->ID;
 			break;
