@@ -53,6 +53,89 @@ function possibly_delete_post( $post_id ) {
 }
 
 /**
+ * 指定されたwebinarのチケットの投稿オブジェクトが格納された配列を返す
+ *
+ * @param int $webinar_id Webinar ID.
+ * @return array チケット投稿オブジェクトが格納された配列.
+ */
+function get_tickets( $webinar_id ) {
+	$tickets = get_posts(
+		array(
+			'post_type'      => 'webinar-ticket',
+			'posts_per_page' => -1,
+			'meta_query'     => array(
+				array(
+					'key'   => 'webinar',
+					'value' => $webinar_id,
+				),
+			),
+		)
+	);
+
+	return $tickets;
+}
+
+/**
+ * チケットを持っているかを判定し、結果を返す。
+ *
+ * @param int   $current_user_id User id.
+ * @param array $tickets チケットオブジェクトが格納された配列.
+ * @return array 参加者, チケットid.
+ */
+function has_ticket( $current_user_id, $tickets ) {
+	$current_user_id = ( wp_get_current_user() )->ID;
+	$is_attendee     = false;
+	$ticket_id       = false;
+	foreach ( $tickets as $ticket ) {
+		if ( $ticket->post_author === $current_user_id ) {
+			$is_attendee = true;
+			$ticket_id   = $ticket->ID;
+			break;
+		}
+	}
+
+	return array( $is_attendee, $ticket_id );
+}
+
+/**
+ * 予約可能かをチェックする
+ *
+ * @param int    $now チェックしたい時間（unix time）.
+ * @param string $close_option 募集締め切りのオプション値.
+ * @param int    $end_time イベントの終了時間.
+ * @return array 予約可能、メッセージ.
+ */
+function can_reserve( $now_time, $close_option, $close_time, $end_time ) {
+	switch ( $close_option ) {
+		case '10min':
+			$close_time -= 60 * 10;
+			$close_msg   = '10分前まで';
+			break;
+		case '30min':
+			$close_time -= 60 * 30;
+			$close_msg   = '30分前まで';
+			break;
+		case '1d':
+			$close_time  = strtotime( date( 'Y-m-d 23:59:59', $close_time ) );
+			$close_time -= 24 * 60 * 60;
+			$close_msg   = '前日まで';
+			break;
+		case '3d':
+			$close_time  = strtotime( date( 'Y-m-d 23:59:59', $close_time ) );
+			$close_time -= 3 * 24 * 60 * 60;
+			$close_msg   = '3日前まで';
+			break;
+		default:
+			$close_time = $end_time;
+			$close_msg  = '途中参加OK';
+			break;
+	}
+	$can_reserve = $now_time < $close_time;
+
+	return array( $can_reserve, $close_time, $close_msg );
+}
+
+/**
  * acf
  */
 if( function_exists('acf_add_local_field_group') ):

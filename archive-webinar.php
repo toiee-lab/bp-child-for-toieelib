@@ -25,114 +25,73 @@ get_header(); ?>
 				<th>🎟 募集人数</th>
 			</tr>
 		<?php /* Start the Loop */ ?>
-		<?php while ( have_posts() ) : the_post();
+		<?php while ( have_posts() ) : ?>
+			<?php
+			the_post();
 
-			$fields     = get_fields();
-			$open       = $fields['open'];
-			$in_time    = strtotime( $fields['time_start'] ) > time();
-			$tickets     = get_posts(
-				array(
-					'post_type' => 'webinar-ticket',
-					'posts_per_page' => -1,
-					'meta_query' => array(
-						array(
-							'key' => 'webinar',
-							'value' => get_the_ID(),
-						),
-					),
-				)
-			);
+			$fields = get_fields();
+
+			/* 空席チェック */
+			$tickets    = get_tickets( get_the_ID() );
 			$ticket_num = count( $tickets );
+			$limit      = $fields['limit'];
+			$vacant     = $ticket_num < $limit;
 
-			// reserve close time
-			$close_time = strtotime( $fields['time_start'] );
-			$close_msg  = '申し込みは、直前までOK';
-			switch ( $fields['time_close'] ) {
-				case '0':
-					$close_time = strtotime( $fields['time_end'] );
-					$close_msg  = '途中参加OK';
-					break;
-				case '10min':
-					$close_time -= 60 * 10;
-					$close_msg   = '申し込みは、10分前まで';
-					break;
-				case '30min':
-					$close_time -= 60 * 30;
-					$close_msg   = '申し込みは、30分前まで';
-					break;
-				case '1d':
-					$close_time  = strtotime( date( 'Y-m-d 23:59:59', $close_time ) );
-					$close_time -= 24 * 60 * 60;
-					$close_msg   = '申し込みは、前日まで';
-					break;
-				case '3d':
-					$close_time  = strtotime( date( 'Y-m-d 23:59:59', $close_time ) );
-					$close_time -= 3 * 24 * 60 * 60;
-					$close_msg   = '申し込みは、3日前まで';
-					break;
-			}
-			$can_reserve = $close_time > time();
+			/* 締め切りのための計算 */
+			$now_time   = time();
+			$start_time = strtotime( $fields['time_start'] );
+			$end_time   = strtotime( $fields['time_end'] );
 
-			// vacant
-			$limit = $fields['limit'];
-			if ( $ticket_num < $limit ) {
-				$vacant = true;
-			} else {
-				$vacant = false;
-			}
+			list( $can_reserve, $close_time, $close_msg ) = can_reserve( $now_time, $fields['time_close'], $start_time, $end_time );
 
-			$available       = $open && $in_time && $vacant && $can_reserve;
-			$available_class = $available ? 'webinar-available' : 'webinar-disable';
+			/* 募集されていて、開催期間中で、空席があって、予約可能 */
+			$open      = $fields['open'];
+			$in_time   = $now_time < $end_time;
+			$available = $open && $in_time && $vacant && $can_reserve;
 
-			$current_user_id = ( wp_get_current_user() )->ID;
-			$is_attendee     = false;
-			$ticket_id       = false;
-			foreach ( $tickets as $ticket ) {
-				if ( $ticket->post_author == $current_user_id ) {
-					$is_attendee = true;
-					$ticket_id   = $ticket->ID;
-					break;
-				}
-			}
-
-			$status = '';
+			$ticket_status = '';
 			if ( $can_reserve ) {
-				if( $open ) {
+				if ( $open ) {
 					if ( $is_attendee ) {
-						$status = '申し込み済';
+						$ticket_status = '申し込み済';
 					} else {
 						if ( $vacant ) {
-							$status = '募集中';
+							$ticket_status = '募集中';
 						} else {
-							$status = '満席';
+							$ticket_status = '満席';
 						}
 					}
 				} else {
-					$status = '閉鎖中';
+					$ticket_status = '閉鎖中';
 				}
 			} else {
-				$status = '終了しました';
+				$ticket_status = '終了しました';
 			}
-		?>
-			<tr class="<?php echo $available_class; ?>">
-				<td><?php echo date_i18n( 'n月 d日(D)', strtotime( $fields['time_start'] ) ); ?><br>
-				<?php echo date( 'H:i', strtotime( $fields['time_start'] ) ); ?> - <?php echo date( 'H:i', strtotime( $fields['time_end'] ) ); ?><br>
-				<small><?php echo $close_msg; ?></small></td>
+
+			$available_class = $available ? '' : 'webinar-disable';
+			?>
+			<tr class="<?php echo esc_attr( $available_class ); ?>">
+				<td>
+					<?php echo esc_html( date_i18n( 'n月 d日(D)', $start_time ) ); ?><br>
+					<?php echo esc_html( gmdate( 'H:i', $start_time ) . ' - ' . gmdate( 'H:i', $end_time ) ); ?><br>
+					<small><?php echo esc_html( $close_msg ); ?></small></td>
 				<td><a href="<?php the_permalink(); ?>"><?php the_title( '<strong>', '</strong>' ); ?></a><br>
 				</td>
 				<td>
-					<?php echo $ticket_num; ?> / <?php echo $limit; ?>人<br>
-					<?php echo $status; ?>
+					<?php echo esc_html( $ticket_num ); ?> / <?php echo esc_html( $limit ); ?>人<br>
+					<?php echo esc_html( $ticket_status ); ?>
 				</td>
 			</tr>
 		<?php endwhile; ?>
 		</table></div><!-- .loop-wrapper -->
 
 		<?php
-		the_posts_pagination( array(
-			'prev_text' => esc_html__( '&laquo; Previous', 'businesspress' ),
-			'next_text' => esc_html__( 'Next &raquo;', 'businesspress' ),
-		) );
+		the_posts_pagination(
+			array(
+				'prev_text' => esc_html__( '&laquo; Previous', 'businesspress' ),
+				'next_text' => esc_html__( 'Next &raquo;', 'businesspress' ),
+			)
+		);
 		?>
 
 	<?php else : ?>

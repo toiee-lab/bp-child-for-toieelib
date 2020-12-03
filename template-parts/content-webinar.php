@@ -4,14 +4,14 @@
  *
  * @package BusinessPress
  */
-?>
 
+?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
-		<div class="wp-block-bp-blocks-bp-subheader"><a href="<?php echo get_post_type_archive_link( 'webinar' ); ?>">ウェビナー</a></div>
+		<div class="wp-block-bp-blocks-bp-subheader"><a href="<?php echo esc_url( get_post_type_archive_link( 'webinar' ) ); ?>">ウェビナー</a></div>
 		<h1 class="entry-title"><?php the_title(); ?></h1>
 		<?php businesspress_entry_meta(); ?>
-		<?php if ( has_post_thumbnail() && ! get_theme_mod( 'businesspress_hide_featured_image_on_full_text' ) ): ?>
+		<?php if ( has_post_thumbnail() && ! get_theme_mod( 'businesspress_hide_featured_image_on_full_text' ) ) : ?>
 		<div class="post-thumbnail"><?php the_post_thumbnail(); ?></div>
 		<?php endif; ?>
 	</header><!-- .entry-header -->
@@ -21,152 +21,103 @@
 		<?php
 		wp_link_pages(
 			array(
-				'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'businesspress' ),
-				'after'  => '</div>', 'pagelink' => '<span class="page-numbers">%</span>',
+				'before'   => '<div class="page-links">' . esc_html__( 'Pages:', 'businesspress' ),
+				'after'    => '</div>',
+				'pagelink' => '<span class="page-numbers">%</span>',
 			)
 		);
 		?>
 		<?php
-		$fields     = get_fields();
-		$open       = $fields['open'];
-		$in_time    = strtotime( $fields['time_end'] ) > time();
-		$tickets     = get_posts(
-			array(
-				'post_type'      => 'webinar-ticket',
-				'posts_per_page' => -1,
-				'meta_query'     => array(
-					array(
-						'key'   => 'webinar',
-						'value' => get_the_ID(),
-					),
-				),
-			)
-		);
+		$fields = get_fields();
+
+		/* 空席チェック */
+		$tickets    = get_tickets( get_the_ID() );
 		$ticket_num = count( $tickets );
+		$vacant     = $ticket_num < $fields['limit'];
 
-		// reserve close time
-		$close_time = strtotime( $fields['time_start'] );
-		$close_msg  = '直前までOK';
-		switch ( $fields['time_close'] ) {
-			case '0':
-				$close_time = strtotime( $fields['time_end'] );
-				$close_msg  = '途中参加OK';
-				break;
-			case '10min':
-				$close_time -= 60 * 10;
-				$close_msg   = '10分前まで';
-				break;
-			case '30min':
-				$close_time -= 60 * 30;
-				$close_msg   = '30分前まで';
-				break;
-			case '1d':
-				$close_time  = strtotime( date( 'Y-m-d 23:59:59', $close_time ) );
-				$close_time -= 24 * 60 * 60;
-				$close_msg   = '前日まで';
-				break;
-			case '3d':
-				$close_time  = strtotime( date( 'Y-m-d 23:59:59', $close_time ) );
-				$close_time -= 3 * 24 * 60 * 60;
-				$close_msg   = '3日前まで';
-				break;
-		}
-		$can_reserve = $close_time > time();
+		/* 締め切りのための計算 */
+		$now_time   = time();
+		$start_time = strtotime( $fields['time_start'] );
+		$end_time   = strtotime( $fields['time_end'] );
 
-		// vacant
-		if ( $ticket_num < $fields['limit'] ) {
-			$vacant = true;
-		} else {
-			$vacant = false;
-		}
+		list( $can_reserve, $close_time, $close_msg ) = can_reserve( $now_time, $fields['time_close'], $start_time, $end_time );
 
+		/* 募集されていて、開催期間中で、空席があって、予約可能 */
+		$open      = $fields['open'];
+		$in_time   = $now_time < $end_time;
 		$available = $open && $in_time && $vacant && $can_reserve;
-
-		$current_user_id = ( wp_get_current_user() )->ID;
-		$is_attendee     = false;
-		$ticket_id       = false;
-		foreach ( $tickets as $ticket ) {
-			if ( $ticket->post_author == $current_user_id ) {
-				$is_attendee = true;
-				$ticket_id   = $ticket->ID;
-				break;
-			}
-		}
-
-		// 開いていない理由
-		// (1)期限切れ、(2)募集していない、(3)満席
-		//var_dump( $fields );
 
 		?>
 		<div class="webinar-info">
 			<h2>📣 ウェビナー情報</h2>
-			<?php if ( $available && ! $is_attendee ) : ?>
-				<?php
-				if ( is_user_logged_in() ) {
-					$cu = wp_get_current_user();
-					echo '<div style="margin-bottom: 1.5em">';
-					acf_form(array(
-						'post_id'       => 'new_post',
-						'new_post'      => array(
-							'post_type'   => 'webinar-ticket',
-							'post_status' => 'publish',
-							'post_title'    => $cu->user_lastname . ' ' . $cu->user_firstname . ' ' . $cu->user_email,
+			<?php if ( $in_time ) : /* イベント期間内 */ ?>
+				<?php if ( $available ) : /* 申し込み可能 */ ?>
+					<?php if ( is_user_logged_in() ) :  /* ログイン状態 */ ?>
+						<?php
+						/* 参加者チェック */
+						$cu = wp_get_current_user();
 
-						),
-						'post_title'    => false,
-						'post_content'  => false,
-						'submit_value'  => '参加する',
-						'html_after_fields'  => '<input type="hidden" name="acf[webinar]" value="' . get_the_ID() . '"/>',
-						'updated_message' => '<p>処理完了！</p>',
-						'fields'             => array( 'dummy' ),
-					));
-					echo '</div>';
-				} else {
-					echo '<p>参加するには、会員ログインが必要です。</p>';
-				}
-				?>
-			<?php else : ?>
-				<?php
-				if ( ! $open ) {
-					echo '<p>現在、募集しておりません。</p>';
-				}
-				if ( ! $in_time ) {
-					echo '<p>イベントは終了しました。</p>';
-				}
-				if ( ! $vacant ) {
-					echo '<p>満席です。</p>';
-				}
-				?>
+						list( $is_attendee, $ticket_id ) = has_ticket( $cu->ID, $tickets );
+
+						if ( $is_attendee ) { /* 参加者の場合 */
+							echo '<div class="attendee-message"><h3>🎉 申し込み済みです</h3>' . wp_kses_post( $fields['message'] ) . '</div>';
+							echo '<div style="margin-bottom: 1.5em">';
+							acf_form(
+								array(
+									'post_id'           => $ticket_id,
+									'post_title'        => false,
+									'post_content'      => false,
+									'submit_value'      => 'キャンセルする',
+									'html_after_fields' => '<input type="hidden" name="acf[delete_this_post]" value="1" />',
+									'updated_message'   => '<p>処理完了！</p>',
+									'fields'            => array( 'dummy' ),
+								)
+							);
+							echo '</div>';
+						} else { /* 参加者じゃない場合 */
+							echo '<div style="margin-bottom: 1.5em">';
+							acf_form(
+								array(
+									'post_id'           => 'new_post',
+									'new_post'          => array(
+										'post_type'   => 'webinar-ticket',
+										'post_status' => 'publish',
+										'post_title'  => $cu->user_lastname . ' ' . $cu->user_firstname . ' ' . $cu->user_email,
+									),
+									'post_title'        => false,
+									'post_content'      => false,
+									'submit_value'      => '参加する',
+									'html_after_fields' => '<input type="hidden" name="acf[webinar]" value="' . get_the_ID() . '"/>',
+									'updated_message'   => '<p>処理完了！</p>',
+									'fields'            => array( 'dummy' ),
+								)
+							);
+							echo '</div>';
+						}
+						?>
+					<?php else : /* ログアウト状態 */ ?>
+						<p>参加するには、<a href="#bp-login-form">会員ログイン</a>が必要です。</p>
+					<?php endif; ?>
+				<?php else : /* 申し込みできない状態 */ ?>
+					<?php if ( ! $open ) : ?>
+				<p>⛔️ 募集開始されていません。</p>
+					<?php elseif ( ! $vacant ) : ?>
+				<p>🈵 満席です。</p>
+					<?php else : ?>
+				<p>🙇‍♂️ ご参加いただけません</p>
+					<?php endif; ?>
+				<?php endif; ?>
+			<?php else : /* イベント期間外 */ ?>
+				<p>🙇‍♂️ イベントは、終了しました。</p>
 			<?php endif; ?>
-			<?php if ( $is_attendee ) {
-				if ( $in_time ) {
-					echo '<div class="attendee-message"><h3>🎉 申し込み済みです</h3>' . $fields['message'] . '</div>';
-					$cu = wp_get_current_user();
-					echo '<div style="margin-bottom: 1.5em">';
-					acf_form(array(
-						'post_id'       => $ticket_id,
-						'post_title'    => false,
-						'post_content'  => false,
-						'submit_value'  => 'キャンセルする',
-						'html_after_fields'  => '<input type="hidden" name="acf[delete_this_post]" value="1" />',
-						'updated_message' => '<p>処理完了！</p>',
-						'fields'             => array( 'dummy' ),
-					));
-					echo '</div>';
-
-				} else {
-					echo '<p>ご参加、ありがとうございました！</p>';
-				}
-			}
-			?>
 			<dl>
 				<dt>📅 開催日時</dt>
-				<dd><?php echo date( 'Y年 n月 d日 H:i', strtotime( $fields['time_start'] ) ); ?> - <?php echo date( 'H:i', strtotime( $fields['time_end'] ) ); ?> (日本時間)<br>
-				<small><strong>締め切り <?php echo $close_msg; ?> (<?php echo date( 'Y年m月d日 H:i', $close_time ); ?>)</strong></small></dd>
+				<dd><?php echo esc_html( gmdate( 'Y年 n月 d日 H:i', $start_time ) ); ?> - <?php echo esc_html( gmdate( 'H:i', $end_time ) ); ?> (日本時間)<br>
+				<small><strong>締め切り <?php echo esc_html( $close_msg ); ?> (<?php echo esc_html( gmdate( 'Y年m月d日 H:i', $close_time ) ); ?>)</strong></small></dd>
 			</dl>
 			<dl>
 				<dt>🔖 募集人数（申し込み数 / 募集人数）</dt>
-				<dd><?php echo $ticket_num; ?> / <?php echo $fields['limit']; ?>人</dd>
+				<dd><?php echo esc_html( $ticket_num ); ?> / <?php echo esc_html( $fields['limit'] ); ?>人</dd>
 			</dl>
 		</div>
 
@@ -177,9 +128,9 @@
 				if ( count( $tickets ) ) {
 					echo "<ul>\n";
 					foreach ( $tickets as $ticket ) {
-						$tu = get_user_by( 'ID', $ticket->post_author );
+						$tu         = get_user_by( 'ID', $ticket->post_author );
 						$list_title = $ticket->ID . ' : ' . $tu->user_lastname . ' ' . $tu->user_firstname . ' ' . $tu->user_email;
-						echo '<li><a href="' . get_admin_url() .  'post.php?post=' . $ticket->ID . '&action=edit">' . $list_title . '</a></li>';
+						echo '<li><a href="' . get_admin_url() . 'post.php?post=' . $ticket->ID . '&action=edit">' . $list_title . '</a></li>';
 					}
 					echo "</ul>\n";
 				} else {
@@ -194,14 +145,14 @@
 	<div class="tags-links">
 		<?php the_tags( '', esc_html__( ', ', 'businesspress' ) ); ?>
 	</div>
-	<?php endif; // End if $the_tags ?>
+	<?php endif; /* End if $the_tags */ ?>
 
 </article><!-- #post-## -->
 
 <?php if ( ! get_theme_mod( 'businesspress_hide_post_nav' ) ) : ?>
 	<?php businesspress_post_nav(); ?>
 <?php endif; ?>
-<p style="text-align:center"><a href="<?php echo get_post_type_archive_link( 'webinar' ); ?>">ウェビナー一覧へ</a></p>
+<p style="text-align:center"><a href="<?php echo esc_url( get_post_type_archive_link( 'webinar' ) ); ?>">ウェビナー一覧へ</a></p>
 
 <?php if ( class_exists( 'Jetpack_RelatedPosts' ) ) : ?>
 	<?php echo do_shortcode( '[jetpack-related-posts]' ); ?>
