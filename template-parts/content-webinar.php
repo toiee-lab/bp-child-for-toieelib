@@ -33,7 +33,8 @@
 		/* 空席チェック */
 		$tickets    = get_tickets( get_the_ID() );
 		$ticket_num = count( $tickets );
-		$vacant     = $ticket_num < $fields['limit'];
+		$limit      = $fields['limit'];
+		$vacant     = $ticket_num < $limit;
 
 		/* 締め切りのための計算 */
 		$now_time   = time();
@@ -117,7 +118,7 @@
 			</dl>
 			<dl>
 				<dt>🔖 募集人数（申し込み数 / 募集人数）</dt>
-				<dd><?php echo esc_html( $ticket_num ); ?> / <?php echo esc_html( $fields['limit'] ); ?>人</dd>
+				<dd><?php echo esc_html( $ticket_num ); ?> / <?php echo esc_html( $limit ); ?>人</dd>
 			</dl>
 		</div>
 
