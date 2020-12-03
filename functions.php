@@ -17,6 +17,11 @@ function businesspress_parent_theme_enqueue_styles() {
 	wp_enqueue_style( 'businesspress-lib-style', get_stylesheet_directory_uri() . '/style.css', array( 'businesspress-style' ), '2.1.2' );
 }
 
+function businesspress_lib_scripts() {
+	wp_enqueue_script( 'businesspress-lib-functions', get_stylesheet_directory_uri() . '/assets/functions.js', array( 'fitvids' ), '20201203', true );
+}
+add_action( 'wp_enqueue_scripts', 'businesspress_lib_scripts' );
+
 /**
  * Font awesome を読み込むための設定
  *
