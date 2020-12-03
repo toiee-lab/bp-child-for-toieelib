@@ -5,7 +5,7 @@ Description:    Businesspress child theme.
 Author:         toiee Lab
 Author URI:     https://toiee.jp/
 Template:       businesspress
-Version:        2.1.1
+Version:        2.1.2
 */
 
 .page-title-series {
@@ -140,4 +140,8 @@ Version:        2.1.1
 
 .featured-lead .home-header-button a {
 	margin-top: 10px;
+}
+
+.kameradi-container-video {
+	margin-bottom: 2em;
 }

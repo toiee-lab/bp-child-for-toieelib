@@ -72,12 +72,12 @@ function bpcast_player( $content ) {
 			$episode_type = get_post_meta( $p->ID, 'episode_type', true );
 			if ( 'video' === $episode_type ) {
 				?>
-		<div class="plyr-container-video">
+		<div class="kameradi-container-video">
 				<?php
 				if ( preg_match( '|https://player.vimeo.com/external/([0-9]+)|', $enclosure_url, $matches ) ) {
 					$vid = $matches[1];
 					?>
-			<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/<?php echo $vid; ?>?title=0&amp;byline=0&amp;portrait=0" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" allow="autoplay; fullscreen" allowfullscreen=""></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+			<iframe src="https://player.vimeo.com/video/<?php echo esc_attr( $vid ); ?>?title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
 					<?php
 				} else {
 					/* ビデオのサムネイルが出るので、デフォルトのプレイヤーを使う */
