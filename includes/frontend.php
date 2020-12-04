@@ -77,7 +77,7 @@ function bpcast_player( $content ) {
 				if ( preg_match( '|https://player.vimeo.com/external/([0-9]+)|', $enclosure_url, $matches ) ) {
 					$vid = $matches[1];
 					?>
-			<iframe src="https://player.vimeo.com/video/<?php echo esc_attr( $vid ); ?>?title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+			<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/<?php echo esc_attr( $vid ); ?>?title=0&byline=0&portrait=0" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
 					<?php
 				} else {
 					/* ビデオのサムネイルが出るので、デフォルトのプレイヤーを使う */

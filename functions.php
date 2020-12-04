@@ -15,12 +15,17 @@ add_action( 'wp_enqueue_scripts', 'businesspress_parent_theme_enqueue_styles' );
 function businesspress_parent_theme_enqueue_styles() {
 	wp_enqueue_style( 'businesspress-style', get_template_directory_uri() . '/style.css', array(), '2.0.3' );
 	wp_enqueue_style( 'businesspress-lib-style', get_stylesheet_directory_uri() . '/style.css', array( 'businesspress-style' ), '2.1.2' );
+	wp_enqueue_script( 'businesspress-lib-functions', get_stylesheet_directory_uri() . '/assets/functions.js', array( 'jquery' ), '20201204', true );
 }
 
-function businesspress_lib_scripts() {
-	wp_enqueue_script( 'businesspress-lib-functions', get_stylesheet_directory_uri() . '/assets/functions.js', array( 'fitvids' ), '20201203', true );
-}
-add_action( 'wp_enqueue_scripts', 'businesspress_lib_scripts' );
+add_action(
+	'wp_enqueue_scripts',
+	function() {
+		wp_dequeue_script( 'fitvids' );
+		wp_dequeue_script( 'businesspress-functions' );	
+	},
+	20
+);
 
 /**
  * Font awesome を読み込むための設定
