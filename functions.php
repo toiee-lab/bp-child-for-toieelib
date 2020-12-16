@@ -22,7 +22,7 @@ add_action(
 	'wp_enqueue_scripts',
 	function() {
 		wp_dequeue_script( 'fitvids' );
-		wp_dequeue_script( 'businesspress-functions' );	
+		wp_dequeue_script( 'businesspress-functions' );
 	},
 	20
 );
