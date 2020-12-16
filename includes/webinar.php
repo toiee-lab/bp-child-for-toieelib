@@ -29,6 +29,23 @@ add_filter(
 	3
 );
 
+/*
+ * メインクエリのWebinarのオーダーを変更する
+ */
+add_action(
+	'pre_get_posts',
+	function ( $query ) {
+		if ( is_admin() || ! $query->is_main_query() ) {
+			return;
+		}
+
+		if ( $query->is_post_type_archive( 'webinar' ) ) {
+			$query->set( 'orderby', 'time_start' );
+			$query->set( 'meta_key', 'time_start' );
+		}
+	}
+);
+
 /**
  * ウェビナーのチケットを削除するための処理をフックで追加
  */
