@@ -119,7 +119,7 @@ add_filter(
 		/* webinar の RSS にはメッセージを付けない。イベント日時を入れる */
 		if ( 'webinar' === $p->post_type ) {
 			$t = strtotime( get_field( 'time_start', $post_id ) );
-			return date( 'm月d日 H:i 〜', $t ) . ' ' . $title;
+			return date( 'n月d日 H:i 〜', $t ) . ' ' . $title;
 		}
 
 		if ( ! current_user_can( 'wc_memberships_view_delayed_post_content', $post_id )
@@ -132,6 +132,18 @@ add_filter(
 	10,
 	2
 );
+
+function sv_wc_memberships_restricted_message_remove_from_feeds( $message ) {
+	global $wp_query;
+
+	/* 原因がわからないが、nullにすると抜粋が丸ごと消えるので、spanを挿入 */
+	if ( $wp_query instanceof \WP_Query && $wp_query->is_feed() ) {
+		$message = '<span></span>';
+	}
+
+	return $message;
+}
+add_filter( 'wc_memberships_restricted_message', 'sv_wc_memberships_restricted_message_remove_from_feeds' );
 
 
 function bpcast_wc_redirect() {
