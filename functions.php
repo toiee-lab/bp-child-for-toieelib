@@ -88,3 +88,16 @@ function bplib_category() {
 	/* the_category( '<span class="category-sep">/</span>' ); */
 	echo '</div><!-- .cat-links -->';
 }
+
+/**
+ * サムネイルをRSSに追加
+ */
+function tlib_post_thumbnails_in_feeds( $content ) {
+	global $post;
+	if ( has_post_thumbnail( $post->ID ) ) {
+		$content = '<p>' . get_the_post_thumbnail( $post->ID ) . '</p>' . $content;
+	}
+	return $content;
+}
+add_filter( 'the_excerpt_rss', 'tlib_post_thumbnails_in_feeds' );
+add_filter( 'the_content_feed', 'tlib_post_thumbnails_in_feeds' );
