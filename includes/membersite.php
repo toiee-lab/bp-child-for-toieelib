@@ -119,7 +119,7 @@ add_filter(
 		/* webinar の RSS にはメッセージを付けない。イベント日時を入れる */
 		if ( 'webinar' === $p->post_type ) {
 			$t = strtotime( get_field( 'time_start', $post_id ) );
-			return date( 'n月d日 H:i 〜', $t ) . ' ' . $title;
+			return date( 'n月d日(D) H:i 〜', $t ) . ' ' . $title;
 		}
 
 		if ( ! current_user_can( 'wc_memberships_view_delayed_post_content', $post_id )
