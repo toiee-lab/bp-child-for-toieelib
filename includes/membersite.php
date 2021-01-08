@@ -116,6 +116,12 @@ add_filter(
 		$p       = get_post();
 		$post_id = $p->ID;
 
+		/* webinar の RSS にはメッセージを付けない。イベント日時を入れる */
+		if ( 'webinar' === $p->post_type ) {
+			$t = strtotime( get_field( 'time_start', $post_id ) );
+			return date( 'm月d日 H:i 〜', $t ) . ' ' . $title;
+		}
+
 		if ( ! current_user_can( 'wc_memberships_view_delayed_post_content', $post_id )
 			|| ! current_user_can( 'wc_memberships_view_restricted_post_content', $post_id ) ) {
 
