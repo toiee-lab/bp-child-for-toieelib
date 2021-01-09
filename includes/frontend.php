@@ -110,8 +110,11 @@ add_action( 'the_excerpt', 'bpcast_player' );
 
 function bpcast_disable_thumbnail( $has_thumbnail, $post, $thumbnail_id ) {
 	if ( ! is_admin() && is_main_query() ) {
+		global $wp_query;
 		if ( 'podcast' === get_post_type( $post ) ) {
-			return false;
+			if( ! isset( $wp_query->query['feed'] ) ) {
+				return false;
+			}
 		}
 	}
 
