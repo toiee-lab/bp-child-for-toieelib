@@ -122,10 +122,14 @@ add_filter(
 			return date( 'n月d日(D) H:i 〜', $t ) . ' ' . $title;
 		}
 
-		if ( ! current_user_can( 'wc_memberships_view_delayed_post_content', $post_id )
-			|| ! current_user_can( 'wc_memberships_view_restricted_post_content', $post_id ) ) {
+		/* feedタイプが、podcast の場合だけ */
+		global $wp_query;
+		if ( 'podcast' === $wp_query->query['feed'] ) {
+			if ( ! current_user_can( 'wc_memberships_view_delayed_post_content', $post_id )
+				|| ! current_user_can( 'wc_memberships_view_restricted_post_content', $post_id ) ) {
 
-			$title = "【ご覧いただけません】 {$title}";
+				$title = "【ご覧いただけません】 {$title}";
+			}
 		}
 		return $title;
 	},
